@@ -33,7 +33,7 @@ class User {
             return['error' => 'Preparation requête échouée'];
         }
         
-        $insert->bind_param('sssss', $login, $password, $email, $firstname,$lastname); 
+        $insert->bind_param('sssss', $login, $hash, $email, $firstname,$lastname); 
 
         if (!$insert->execute()){
             $err= $insert->error;
@@ -60,10 +60,61 @@ class User {
             'firstname' => $this->firstname,
             'lastname' => $this->lastname
         ];
-
-        }
 }
 
 
+public function connect($login, $password){
+    $mysqli = new mysqli('localhost', 'root', '', 'classes'); 
+    if ($mysqli->connect_errno){
+        die('ERREUR CONNEXION MySQL: ' . $mysqli->connect_error); 
+    } 
+
+    // NE PAS re-hasher ici
+    $conn = $mysqli->prepare("SELECT id, login, password, email, firstname, lastname FROM utilisateurs WHERE login = ?");
+    if (!$conn){
+        $mysqli->close();
+        return ['error' => 'Préparation requête échouée'];
+    }
+
+    $conn->bind_param('s', $login);
+    $conn->execute();
+    $conn->store_result();
+
+    if ($conn->num_rows === 0){
+        $conn->close();
+        $mysqli->close();
+        return ['error' => 'Login inconnu'];
+    }
+
+    $conn->bind_result($id, $dbLogin, $dbHash, $dbEmail, $dbFirstname, $dbLastname);
+    $conn->fetch();
+
+    // Comparer le mot de passe tapé au hash stocké
+    if (!password_verify($password, $dbHash)){
+        $conn->close();
+        $mysqli->close();
+        return ['error' => 'Mot de passe incorrect'];
+    }
+
+    $this->id = $id;
+    $this->login = $dbLogin;
+    $this->password = $dbHash;
+    $this->email = $dbEmail;
+    $this->firstname = $dbFirstname;
+    $this->lastname = $dbLastname;
+
+    $conn->close();
+    $mysqli->close();
+
+    return [
+        'id' => $this->id,
+        'login' => $this->login,
+        'email' => $this->email,
+        'firstname' => $this->firstname,
+        'lastname' => $this->lastname
+    ];
+}
+
+}
 
 

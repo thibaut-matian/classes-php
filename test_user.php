@@ -23,3 +23,11 @@ echo '<hr>';
 $user = new User();
 $resultat = $user->register('LoginTest', 'secret123', 'test@mail.com', 'Jean', 'Doe'); 
 var_dump($resultat); 
+
+
+echo '<hr>'; 
+
+$user = new User();
+$user->register('testLogin','abc123','t@mail.com','Jean','Test');
+$u2 = new User();
+var_dump($u2->connect('testLogin','abc123'));
