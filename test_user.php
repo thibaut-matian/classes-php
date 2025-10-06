@@ -31,3 +31,10 @@ $user = new User();
 $user->register('testLogin','abc123','t@mail.com','Jean','Test');
 $u2 = new User();
 var_dump($u2->connect('testLogin','abc123'));
+
+echo '<hr>';
+
+$user = new User();
+$user->register('toDelete','pass123','d@mail.com','Jean','Delete');
+var_dump($user->delete()); // true
+var_dump($user);  

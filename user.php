@@ -125,6 +125,38 @@ public function disconnect() {
     $this->lastname = '';
     return true;
 }
+
+public function delete() {
+    if ($this->id === null) {
+        return ['error' => 'Aucun utilisateur connecté'];
+    }
+
+    $mysqli = new mysqli('localhost', 'root', '', 'classes');
+    if ($mysqli->connect_errno) {
+        die('ERREUR CONNEXION MySQL: ' . $mysqli->connect_error);
+    }
+
+    $conn = $mysqli->prepare("DELETE FROM utilisateurs WHERE id = ?");
+    if (!$conn) {
+        $mysqli->close();
+        return ['error' => 'Préparation requête échouée'];
+    }
+
+    $conn->bind_param('i', $this->id);
+
+    if (!$conn->execute()) {
+        $err = $conn->error;
+        $conn->close();
+        $mysqli->close();
+        return ['error' => 'Suppression échouée: ' . $err];
+    }
+
+    $conn->close();
+    $mysqli->close();
+
+    
+    $this->disconnect();
+    return true;
 }
 
 
