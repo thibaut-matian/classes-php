@@ -160,3 +160,58 @@ public function delete() {
 }
 
 
+public function update($login, $password, $email, $firstname, $lastname) {
+    if ($this->id === null) {
+        return ['error' => 'Aucun utilisateur connecté'];
+    }
+
+    $mysqli = new mysqli('localhost', 'root', '', 'classes');
+    if ($mysqli->connect_errno) {
+        die('ERREUR CONNEXION MySQL: ' . $mysqli->connect_error);
+    }
+
+    // Re-hash seulement si un nouveau mot de passe est fourni ( demande a chat )
+    $newHash = $this->password;
+    if ($password !== null && $password !== '') {
+        $newHash = password_hash($password, PASSWORD_BCRYPT);
+    }
+
+    $conn = $mysqli->prepare("UPDATE utilisateurs SET login = ?, password = ?, email = ?, firstname = ?, lastname = ? WHERE id = ?");
+    if (!$conn) {
+        $mysqli->close();
+        return ['error' => 'Préparation requête échouée'];
+    }
+
+    $conn->bind_param('sssssi', $login, $newHash, $email, $firstname, $lastname, $this->id);
+
+    if (!$conn->execute()) {
+        $err = $conn->error;
+        $conn->close();
+        $mysqli->close();
+        return ['error' => 'Mise à jour échouée: ' . $err];
+    }
+
+    $conn->close();
+    $mysqli->close();
+
+    // Update l'objet
+    $this->login = $login;
+    $this->password = $newHash;
+    $this->email = $email;
+    $this->firstname = $firstname;
+    $this->lastname = $lastname;
+
+    return [
+        'id' => $this->id,
+        'login' => $this->login,
+        'email' => $this->email,
+        'firstname' => $this->firstname,
+        'lastname' => $this->lastname
+    ];
+}
+
+public function isConnected() : bool {
+    return $this->id !== null;
+}
+}
+
