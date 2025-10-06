@@ -34,7 +34,18 @@ var_dump($u2->connect('testLogin','abc123'));
 
 echo '<hr>';
 
+
 $user = new User();
 $user->register('toDelete','pass123','d@mail.com','Jean','Delete');
 var_dump($user->delete()); // true
 var_dump($user);  
+
+
+echo '<hr>';
+
+$user = new User();
+var_dump($user->isConnected());            
+$user->register('log','pass','m@mail.com','A','B');
+var_dump($user->isConnected());            
+$user->disconnect();
+var_dump($user->isConnected());   
