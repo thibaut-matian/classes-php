@@ -213,5 +213,34 @@ public function update($login, $password, $email, $firstname, $lastname) {
 public function isConnected() : bool {
     return $this->id !== null;
 }
+
+public function getAllInfos(): array {
+    return [
+        'id' => $this->id,
+        'login' => $this->login,
+        'password' => $this->password, // hash du mot de passe
+        'email' => $this->email,
+        'firstname' => $this->firstname,
+        'lastname' => $this->lastname
+    ];
+}
+
+public function getLogin(): string {
+    return $this->login;
+}
+
+public function getEmail(): string {
+    return $this->email;
+}
+
+public function getFirstname(): string {
+    return $this->firstname;
+}
+
+public function getLastname(): string {
+    return $this->lastname;
+}
+
+
 }
 
