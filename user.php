@@ -115,6 +115,16 @@ public function connect($login, $password){
     ];
 }
 
+public function disconnect() {
+    
+    $this->id = null;
+    $this->login = '';
+    $this->password = '';
+    $this->email = '';
+    $this->firstname = '';
+    $this->lastname = '';
+    return true;
+}
 }
 
 
