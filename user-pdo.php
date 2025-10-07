@@ -26,72 +26,45 @@ class UserPDO {
         );
     }
 
-     public function register($login, $password, $email, $firstname, $lastname) {
-        try {
-            $pdo = new PDO('mysql:host=localhost;dbname=classes;charset=utf8mb4', 'root', '', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-        } catch (PDOException $e) {
-            die('ERREUR CONNEXION MySQL: ' . $e->getMessage());
-        }
+    public $firstname;
+    public $lastname;
 
-        $hash = password_hash($password, PASSWORD_BCRYPT);
-
-        try {
-            $stmt = $pdo->prepare("INSERT INTO utilisateurs (login, password, email, firstname, lastname) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$login, $hash, $email, $firstname, $lastname]);
-
-            $this->id = (int)$pdo->lastInsertId();
-            $this->login = $login;
-            $this->password = $hash;
-            $this->email = $email;
-            $this->firstname = $firstname;
-            $this->lastname = $lastname;
-
-            return [
-                'id' => $this->id,
-                'login' => $this->login,
-                'password' => $this->password,
-                'email' => $this->email,
-                'firstname' => $this->firstname,
-                'lastname' => $this->lastname
-            ];
-        } catch (PDOException $e) {
-            return ['error' => 'Insertion échouée: ' . $e->getMessage()];
-        }
+    public function __construct($login = '', $password = '', $email = '', $firstname = '', $lastname = '') {
+        $this->id = null;
+        $this->login = $login;
+        $this->password = $password;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
     }
 
-    public function connect($login, $password) {
-        try {
-            $pdo = new PDO('mysql:host=localhost;dbname=classes;charset=utf8mb4', 'root', '', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-        } catch (PDOException $e) {
-            die('ERREUR CONNEXION MySQL: ' . $e->getMessage());
-        }
+    private function pdo(): PDO {
+        return new PDO(
+            'mysql:host=localhost;dbname=classes;charset=utf8mb4',
+            'root',
+            '',
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+    }
 
-        $stmt = $pdo->prepare("SELECT id, login, password, email, firstname, lastname FROM utilisateurs WHERE login = ?");
-        $stmt->execute([$login]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    public function register($login, $password, $email, $firstname, $lastname): array {
+        $pdo = $this->pdo();
+        $hash = password_hash($password, PASSWORD_BCRYPT);
 
-        if (!$row) {
-            return ['error' => 'Login inconnu'];
-        }
+        $stmt = $pdo->prepare("INSERT INTO utilisateurs (login, password, email, firstname, lastname) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$login, $hash, $email, $firstname, $lastname]);
 
-        if (!password_verify($password, $row['password'])) {
-            return ['error' => 'Mot de passe incorrect'];
-        }
-
-        $this->id = (int)$row['id'];
-        $this->login = $row['login'];
-        $this->password = $row['password']; // hash
-        $this->email = $row['email'];
-        $this->firstname = $row['firstname'];
-        $this->lastname = $row['lastname'];
+        $this->id = (int)$pdo->lastInsertId();
+        $this->login = $login;
+        $this->password = $hash;
+        $this->email = $email;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
 
         return [
             'id' => $this->id,
             'login' => $this->login,
+            'password' => $this->password,
             'email' => $this->email,
             'firstname' => $this->firstname,
             'lastname' => $this->lastname
