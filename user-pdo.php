@@ -7,7 +7,15 @@ class UserPDO {
     public $email;
     public $firstname;
     public $lastname;
-
+    
+    private function pdo(): PDO {
+        return new PDO(
+            'mysql:host=localhost;dbname=classes;charset=utf8mb4',
+            'root',
+            '',
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
+    }
       public function __construct($login = '', $password = '', $email = '', $firstname = '', $lastname = '') {
         $this->id = null;
         $this->login = $login;
@@ -17,35 +25,6 @@ class UserPDO {
         $this->lastname = $lastname;
     }
 
-    private function pdo(): PDO {
-        return new PDO(
-            'mysql:host=localhost;dbname=classes;charset=utf8mb4',
-            'root',
-            '',
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    }
-
-    public $firstname;
-    public $lastname;
-
-    public function __construct($login = '', $password = '', $email = '', $firstname = '', $lastname = '') {
-        $this->id = null;
-        $this->login = $login;
-        $this->password = $password;
-        $this->email = $email;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
-    }
-
-    private function pdo(): PDO {
-        return new PDO(
-            'mysql:host=localhost;dbname=classes;charset=utf8mb4',
-            'root',
-            '',
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    }
 
     public function register($login, $password, $email, $firstname, $lastname): array {
         $pdo = $this->pdo();
