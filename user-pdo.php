@@ -1,4 +1,5 @@
 <?php
+
 class UserPDO {
 
     private $id;
@@ -128,4 +129,23 @@ class UserPDO {
             'lastname' => $this->lastname
         ];
     }
+        public function isConnected(): bool {
+        return $this->id !== null;
+    }
+
+    public function getAllInfos(): array {
+        return [
+            'id' => $this->id,
+            'login' => $this->login,
+            'password' => $this->password,
+            'email' => $this->email,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname
+        ];
+    }
+
+    public function getLogin(): string { return $this->login; }
+    public function getEmail(): string { return $this->email; }
+    public function getFirstname(): string { return $this->firstname; }
+    public function getLastname(): string { return $this->lastname; }
 }
